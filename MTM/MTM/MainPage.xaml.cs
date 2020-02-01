@@ -18,52 +18,26 @@ namespace MTM
     {
         readonly WebClient webClient;
         public string url;
-        public string coin;
         public string exchange;
-        public string imageName;
         public string currencyPair;
         public string priceBidAsk;
         public string errorExh;
         public string alertPair;
-        public bool firstUpDown;
         public double oldPrice;
         public double newPrice;
-        public double percentUpDown = 1.05f;
-        public int timerload = 15;
-        public float priceAlertBuyLive;
-        public float priceAlertSellHit;
-        public float priceAlertSellLive;
-        public float priceAlertBuyHit;
         RootObject json;
         public class RootObject
         {
-            /*  public double last { get; set; }
-              public double high { get; set; }
-              public double low { get; set; }
-              public double volume { get; set; }
-              public double vwap { get; set; }
-              public double max_bid { get; set; }
-              public double min_ask { get; set; }*/
             public double best_bid { get; set; }
             public double best_ask { get; set; }
-            //public string ask { get; set; }
-            //public string bid { get; set; }
             public double ask { get; set; }
             public double bid { get; set; }
             public Ticker ticker { get; set; }
         }
         public class Ticker
         {
-            /*   public double high { get; set; }
-               public double low { get; set; }
-               public double avg { get; set; }
-               public double vol { get; set; }
-               public double vol_cur { get; set; }
-               public double last { get; set; }*/
             public double Buy { get; set; }
             public double Sell { get; set; }
-            // public int updated { get; set; }
-            //  public int server_time { get; set; }
         }
         public MainPage()
         {
