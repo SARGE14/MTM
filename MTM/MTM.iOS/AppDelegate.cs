@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using UserNotifications;
-using Foundation;
+﻿using Foundation;
+using System;
 using UIKit;
+using UserNotifications;
 
 namespace MTM.iOS
 {
@@ -13,10 +11,19 @@ namespace MTM.iOS
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
             global::Xamarin.Forms.Forms.Init();
+
+            UIApplication.SharedApplication.SetMinimumBackgroundFetchInterval(UIApplication.BackgroundFetchIntervalMinimum);
+            
             UNUserNotificationCenter.Current.Delegate = new iOSNotificationReceiver();
+           
             LoadApplication(new App());
 
             return base.FinishedLaunching(app, options);
+        }
+
+        public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
+        {
+            completionHandler(UIBackgroundFetchResult.NewData);
         }
     }
 }

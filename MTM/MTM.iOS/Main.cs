@@ -4,7 +4,6 @@ using System.Linq;
 
 using Foundation;
 using UIKit;
-
 namespace MTM.iOS
 {
     public class Application

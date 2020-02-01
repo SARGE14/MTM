@@ -1,23 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
+using System.Net;
 using System.Threading.Tasks;
 using Xamarin.Forms;
-using System.Net;
-using System.Web;
-using Newtonsoft.Json;
 
 namespace MTM
 {
-    // Learn more about making custom code visible in the Xamarin.Forms previewer
-    // by visiting https://aka.ms/xamarinforms-previewer
     [DesignTimeVisible(false)]
     public partial class MainPage : ContentPage
     {
         INotificationManager notificationManager;
-        int notificationNumber = 0;
         readonly WebClient webClient;
         public string url;
         public string coin;
@@ -73,7 +66,7 @@ namespace MTM
             while (updateSwitch.IsToggled)
             {
                 PriceGet();
-              //  errorText.Text = notificationNumber++.ToString();
+                //  errorText.Text = notificationNumber++.ToString();
                 await Task.Delay(30000);
             }
         }
@@ -88,7 +81,7 @@ namespace MTM
         {
             Device.BeginInvokeOnMainThread(() =>
             {
-             //   messageText.Text = $"{title}\n{message}";
+                //   messageText.Text = $"{title}\n{message}";
             });
         }
         private void WebTest()
@@ -126,8 +119,8 @@ namespace MTM
         private void OnButtonClicked(object sender, EventArgs e)
         {
             PriceGet();
-           /* if (updateSwitch.IsToggled)
-                UpdateTimer();*/
+            /* if (updateSwitch.IsToggled)
+                 UpdateTimer();*/
         }
 
         private void PriceGet()
@@ -243,7 +236,6 @@ namespace MTM
                     messageText.Text = "Цена на " + exchange + " вверх на " + calcPriceUp.ToString("F") + "%";
                     toastMesLine1 = "Старая цена: " + oldPrice.ToString("F8");
                     toastMesLine2 = "Новая цена: " + newPrice.ToString("F8");
-                    // imageName = "Resources/greenup.png";
                     ToastPrice();
                 }
                 if (percentUpDown < calcPriceDown)
@@ -253,7 +245,6 @@ namespace MTM
                     messageText.Text = "Цена на " + exchange + " вниз на " + calcPriceDown.ToString("F") + "%";
                     toastMesLine1 = "Старая цена: " + oldPrice.ToString("F8");
                     toastMesLine2 = "Новая цена: " + newPrice.ToString("F8");
-                    //   imageName = "Resources/reddown.png";
                     ToastPrice();
                 }
             }
@@ -286,7 +277,7 @@ namespace MTM
             messageText.Text = "На HitBTC дешевле на " + result.ToString("F") + "%";
             toastMesLine1 = "HitBTC цена: " + priceAlertSellHit.ToString("F8");
             toastMesLine2 = "Livecoin цена: " + priceAlertBuyLive.ToString("F8");
-      //      imageName = "Resources/hitbtc.png";
+            //      imageName = "Resources/hitbtc.png";
             ToastPrice();
         }
         private void PriceAlertsLive(double result)
@@ -294,14 +285,12 @@ namespace MTM
             messageText.Text = coin + "На Livecoin дешевле на " + result.ToString("F") + "%";
             toastMesLine1 = "Livecoin цена: " + priceAlertSellLive.ToString("F8");
             toastMesLine2 = "HitBTC цена:   " + priceAlertBuyHit.ToString("F8");
-         //  imageName = "Resources/livecoin.png";
+            //  imageName = "Resources/livecoin.png";
             ToastPrice();
         }
         private void ToastPrice()
         {
-            notificationNumber++;
             string title = messageText.Text;
-            //  string message = toastMesLine1 + toastMesLine2;
             string message = $"{toastMesLine1}\n{toastMesLine2}";
             notificationManager.ScheduleNotification(title, message);
         }

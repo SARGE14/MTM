@@ -15,7 +15,6 @@ namespace MTM.iOS
 
         public void Initialize()
         {
-            // request the permission to use local notifications
             UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert, (approved, err) =>
             {
                 hasNotificationsPermission = approved;
@@ -25,7 +24,7 @@ namespace MTM.iOS
         public int ScheduleNotification(string title, string message)
         {
             // EARLY OUT: app doesn't have permissions
-            if(!hasNotificationsPermission)
+            if (!hasNotificationsPermission)
             {
                 return -1;
             }
@@ -37,11 +36,10 @@ namespace MTM.iOS
                 Title = title,
                 Subtitle = "",
                 Body = message,
-                Badge = 1
+                Badge = 1,
+                Sound = UNNotificationSound.Default
             };
 
-            // Local notifications can be time or location based
-            // Create a time-based trigger, interval is in seconds and must be greater than 0
             var trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(0.25, false);
 
             var request = UNNotificationRequest.FromIdentifier(messageId.ToString(), content, trigger);
