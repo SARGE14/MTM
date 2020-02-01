@@ -63,7 +63,10 @@
             <Entry x:Name="priceBtcSell_yobit" TextColor="Red"  Text="0,00050500" Grid.Column="0" Grid.Row="1"/>
         </Grid>
         <Button x:Name="updateButton" Text="Обновить" Clicked="OnButtonClicked"/>
-        <Label x:Name="errorText" Text="Ошибка" FontSize="Large" TextColor="#3D3D3D" HorizontalOptions="End" Grid.Column="1" Grid.Row="0" VerticalOptions="EndAndExpand"/>
+        <Switch x:Name="updateSwitch" IsToggled="False"  Toggled= "UpdateSwitchToggled" HorizontalOptions="End"/>
+        <Label x:Name="messageText" Text="Уведомления" FontSize="Large" TextColor="#5A5A5A" HorizontalOptions="Center"/>
+        <Label x:Name="errorText" Text="Ошибка" FontSize="Large" TextColor="#3D3D3D" HorizontalOptions="End" VerticalOptions="EndAndExpand"/>
+
     </StackLayout>
 
 </ContentPage>

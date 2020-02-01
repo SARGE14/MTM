@@ -16,15 +16,29 @@ namespace MTM
     [DesignTimeVisible(false)]
     public partial class MainPage : ContentPage
     {
+        INotificationManager notificationManager;
+        int notificationNumber = 0;
         readonly WebClient webClient;
         public string url;
+        public string coin;
         public string exchange;
+        public string imageName;
         public string currencyPair;
         public string priceBidAsk;
         public string errorExh;
         public string alertPair;
+        public bool firstUpDown;
+        public bool alive;
         public double oldPrice;
         public double newPrice;
+        public double percentUpDown = 1.09f;
+        public int timerload = 15;
+        public string toastMesLine1;
+        public string toastMesLine2;
+        public float priceAlertBuyLive;
+        public float priceAlertSellHit;
+        public float priceAlertSellLive;
+        public float priceAlertBuyHit;
         RootObject json;
         public class RootObject
         {
@@ -42,9 +56,40 @@ namespace MTM
         public MainPage()
         {
             InitializeComponent();
+            notificationManager = DependencyService.Get<INotificationManager>();
+            notificationManager.NotificationReceived += (sender, eventArgs) =>
+            {
+                var evtData = (NotificationEventArgs)eventArgs;
+                ShowNotification(evtData.Title, evtData.Message);
+            };
             webClient = new WebClient();
-            errorText.Text = "";
+            messageText.Text = "";
+            firstUpDown = true;
+            errorText.Text = "Соединение...";
             PriceGet();
+        }
+        private async void UpdateTimer()
+        {
+            while (updateSwitch.IsToggled)
+            {
+                PriceGet();
+              //  errorText.Text = notificationNumber++.ToString();
+                await Task.Delay(30000);
+            }
+        }
+
+        private void UpdateSwitchToggled(object sender, EventArgs e)
+        {
+            if (updateSwitch.IsToggled)
+                UpdateTimer();
+        }
+
+        void ShowNotification(string title, string message)
+        {
+            Device.BeginInvokeOnMainThread(() =>
+            {
+             //   messageText.Text = $"{title}\n{message}";
+            });
         }
         private void WebTest()
         {
@@ -81,12 +126,14 @@ namespace MTM
         private void OnButtonClicked(object sender, EventArgs e)
         {
             PriceGet();
+           /* if (updateSwitch.IsToggled)
+                UpdateTimer();*/
         }
 
         private void PriceGet()
         {
             string urlExchange;
-            //  messageText.Text = "";
+            messageText.Text = "";
             /*Livecoin*/
             exchange = "Livecoin";
             urlExchange = "https://api.livecoin.net/exchange/ticker?currencyPair=";
@@ -177,11 +224,86 @@ namespace MTM
                 priceBtcBuy_yobit.Text = newPrice.ToString("F8");
 
             }
+            firstUpDown = false;
+            PriceAlert();
         }
 
         private void PriceUpDown()
         {
+            double calcPriceUp;
+            double calcPriceDown;
+            if (!firstUpDown)
+            {
+                calcPriceUp = newPrice / oldPrice;
+                calcPriceDown = oldPrice / newPrice;
+                if (percentUpDown < calcPriceUp)
+                {
+                    /// цена вверх
+                    calcPriceUp = (calcPriceUp - 1f) * 100f;
+                    messageText.Text = "Цена на " + exchange + " вверх на " + calcPriceUp.ToString("F") + "%";
+                    toastMesLine1 = "Старая цена: " + oldPrice.ToString("F8");
+                    toastMesLine2 = "Новая цена: " + newPrice.ToString("F8");
+                    // imageName = "Resources/greenup.png";
+                    ToastPrice();
+                }
+                if (percentUpDown < calcPriceDown)
+                {
+                    /// цена вниз
+                    calcPriceDown = (calcPriceDown - 1f) * 100f;
+                    messageText.Text = "Цена на " + exchange + " вниз на " + calcPriceDown.ToString("F") + "%";
+                    toastMesLine1 = "Старая цена: " + oldPrice.ToString("F8");
+                    toastMesLine2 = "Новая цена: " + newPrice.ToString("F8");
+                    //   imageName = "Resources/reddown.png";
+                    ToastPrice();
+                }
+            }
+        }
+        private void PriceAlert()
+        {
+            float result;
+            priceAlertBuyLive = float.Parse(priceBtcBuy_livecoin.Text);
+            priceAlertSellLive = float.Parse(priceBtcSell_livecoin.Text);
+            priceAlertBuyHit = float.Parse(priceBtcBuy_hitbtc.Text);
+            priceAlertSellHit = float.Parse(priceBtcSell_hitbtc.Text);
 
+            if (priceAlertBuyLive > priceAlertSellHit)
+            {
+                result = (priceAlertBuyLive / priceAlertSellHit - 1f) * 100f;
+                if (result > 3f)
+
+                    PriceAlertsHit(result);
+            }
+            if (priceAlertBuyHit > priceAlertSellLive)
+            {
+                result = (priceAlertBuyHit / priceAlertSellLive - 1f) * 100f;
+                if (result > 3f)
+                    PriceAlertsLive(result);
+            }
+
+        }
+        private void PriceAlertsHit(double result)
+        {
+            messageText.Text = "На HitBTC дешевле на " + result.ToString("F") + "%";
+            toastMesLine1 = "HitBTC цена: " + priceAlertSellHit.ToString("F8");
+            toastMesLine2 = "Livecoin цена: " + priceAlertBuyLive.ToString("F8");
+      //      imageName = "Resources/hitbtc.png";
+            ToastPrice();
+        }
+        private void PriceAlertsLive(double result)
+        {
+            messageText.Text = coin + "На Livecoin дешевле на " + result.ToString("F") + "%";
+            toastMesLine1 = "Livecoin цена: " + priceAlertSellLive.ToString("F8");
+            toastMesLine2 = "HitBTC цена:   " + priceAlertBuyHit.ToString("F8");
+         //  imageName = "Resources/livecoin.png";
+            ToastPrice();
+        }
+        private void ToastPrice()
+        {
+            notificationNumber++;
+            string title = messageText.Text;
+            //  string message = toastMesLine1 + toastMesLine2;
+            string message = $"{toastMesLine1}\n{toastMesLine2}";
+            notificationManager.ScheduleNotification(title, message);
         }
     }
 }

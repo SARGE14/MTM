@@ -10,6 +10,8 @@ namespace MTM
         {
             InitializeComponent();
 
+            DependencyService.Get<INotificationManager>().Initialize();
+
             MainPage = new MainPage();
         }
 
